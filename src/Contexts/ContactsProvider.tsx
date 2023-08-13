@@ -7,7 +7,7 @@ export function useContacts() : any {
     return useContext(ContactsContext)
 }
 
-interface ContactI {
+export interface ContactI {
     id: string,
     name: string
 }
