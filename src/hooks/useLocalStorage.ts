@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { ContactI } from '../Contexts/ContactsProvider'
+import { ConversationI } from '../Contexts/ConversationsProvider'
 
 const PREFIX = 'whatsapp-clone-'
 

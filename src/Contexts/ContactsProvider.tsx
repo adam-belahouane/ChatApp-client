@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import useLocalStorage from '../hooks/useLocalStorage'
 
-const ContactsContext : any = React.createContext({})
+const ContactsContext : any = React.createContext([])
 
 export function useContacts() : any {
     return useContext(ContactsContext)
