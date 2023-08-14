@@ -1,6 +1,7 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import useLocalStorage from '../hooks/useLocalStorage'
 import { ContactI, useContacts } from './ContactsProvider'
+import { useSocket } from './SocketProvider'
 
 const ConversationsContext: any = React.createContext([])
 
@@ -24,6 +25,7 @@ export function ConversationsProvider({ id, children }: { id: string, children: 
     const [conversations, setConversations] = useLocalStorage('conversations', [])
     const [selectConversationIndex, setSelectConversationIndex] = useState(0)
     const { Contacts } = useContacts()
+    const { socket } = useSocket()
 
     function createConversation(recipients: string[]) {
         setConversations((prevConversations: []) => {
@@ -32,7 +34,7 @@ export function ConversationsProvider({ id, children }: { id: string, children: 
     }
 
 
-    function addMessageToConversation({ recipients, text, sender}: {recipients: (ContactI[]|string[]), text: string, sender: string}){
+    const addMessageToConversation = useCallback(({ recipients, text, sender}: {recipients: (ContactI[]|string[]), text: string, sender: string}) => {
         setConversations((prevConversations : ConversationI[]) => {
             let isChanged = false
             const newMessage = { sender, text }
@@ -57,9 +59,21 @@ export function ConversationsProvider({ id, children }: { id: string, children: 
             }
         })
 
-    }
+    }, [setConversations])
+
+    useEffect(() => {
+      if (socket == null) return
+
+      socket.on('receive-message', addMessageToConversation)
+
+      return () => socket.off('receive-message')
+    },[socket, addMessageToConversation])
+    
 
     function sendMessage(recipients: string[], text: string){
+        console.log("im here");
+        
+        socket.emit('send-message', { recipients, text})
         addMessageToConversation({ recipients, text, sender :id})
     }
 
